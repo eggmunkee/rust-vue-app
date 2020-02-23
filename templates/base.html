@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+    <head>
+        <title>{%block title%}Base Template{%endblock%}</title>
+        <link rel="stylesheet" type="text/css" href="/static/test.css">
+       
+        {% block js_includes %}{%endblock%}
+    </head>
+    <body>
+        <h1>{%block page_title%}Base Template{% endblock %}</h1>
+        {% block content %}
+        <p>te;alkjal;kj a;lksjaf;lsk jasfl;jkaefuihaefula feiuhafse luihasu aflu haseuk ase</p>
+        <p>User count: {{ user_count }}</p>
+        <p>te;alkjal;kj a;lksjaf;lsk jasfl;jkaefuihaefula feiuhafse luihasu aflu haseuk ase</p>        
+        {% endblock %}
+        <h2>
+            <a href="/app/">App</a>
+        </h2>
+        <h2>
+            <a href="/index.html">Index</a>
+        </h2>
+        <h2>
+            <a href="/about.html">About</a>
+        </h2>
+        {% block js_footer %}{%endblock%}
+    </body>
+</html>

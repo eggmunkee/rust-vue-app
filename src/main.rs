@@ -1,14 +1,23 @@
 use actix_web::{middleware, web, App, HttpServer};
 
 // Register modules
+mod macros;
+mod core;
 mod urls;
 mod views;
+mod db;
 mod app;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
     env_logger::init();
+
+    db::init_db();
+
+    //println!("TABLE DEF: {}", app::models::test_table_def());
+
+    //println!("User count:{}", app::models::get_user_count(&mut conn));
 
     HttpServer::new(|| {
         App::new()

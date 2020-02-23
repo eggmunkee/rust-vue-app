@@ -3,15 +3,20 @@ use actix_web::{ web };
 use crate::views;
 
 //use crate::urls::app_urls;
+use crate::core;
 use crate::app;
 
 
 pub fn configure_urls(cfg: &mut web::ServiceConfig) {
-    // hardcoded return content:
-    cfg.service(web::resource("/about.html").to(|| async { "Rust Vue App, built with actix_web!" }))
-    .service(web::resource("/index.html").to(|| async { "Hello world!" }))
-    // pass to request handler (view)
-    .service(web::resource("/").to(views::index));
+    core::views::static_urls(cfg);
+    // hardcoded return content:    
+    //.service(web::resource("/static/{url}").to(core::views::static_content))
+    // Index
+    cfg.service(web::resource("/").to(views::index))
+    .service(web::resource("/index.html").to(views::index))
+    // about
+    .service(web::resource("/about.html").to(|| async { "Rust Vue App, built with actix_web!" }));
+
     // include app urls
     app::urls::configure_urls(cfg);
     // other module urls add below
