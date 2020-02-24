@@ -13,6 +13,7 @@ use crate::db::{get_conn};
 pub fn get_user_context(context: &mut Context) {
     // Get users list and create json for list
     let mut conn = get_conn();
+    
     let users = get_users(&mut conn);
     context.insert("users", &users);
     //let users = get_user_list();   
