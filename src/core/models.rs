@@ -5,8 +5,6 @@ use sqlite::{Type,Error};
 //use crate::{create_table, columns, col_text, col_in, insert_row, val_text, val_int};
 const CORE_INIT_TABLE: &str = "core_app_init";
 
-//pub struct 
-
 pub fn init_core(connection: &sqlite::Connection) {
     let cmd = create_table!(CORE_INIT_TABLE,columns!(col_text!("table_name"),col_int!("init")));
     println!("Init app_init table cmd: {}", &cmd);

@@ -1,6 +1,9 @@
-use actix_web::{HttpRequest, HttpResponse};
+use actix_web::{web, HttpRequest, HttpResponse};
 use actix_web::http::{StatusCode};
 use actix_web::dev::{ Body };
+
+
+use serde::Deserialize;
 
 // file reading requirements
 
@@ -28,6 +31,68 @@ pub fn get_user_context(context: &mut Context) {
     
 }
 
+// TESTING PATH AND QUERY 
+// Define query param data structure
+#[derive(Deserialize)] // Allow serde to deserialize struct from query
+pub struct WithQueryInfo {
+    pub item: String, // required query param
+    pub optional: Option<String>, // optional query param
+}
+
+// Require WithQueryInfo and a single url path placeholder String
+// invalid: base/url/any_val/
+// invalid: base/url/any_value/?optional=123
+// valid: base/url/_any__value_/?item=item_val
+// valid: base/url/_any__value_/?item=item_val&optional=opt_val
+//  In above examples, the path String = "_any__value_", query item would be "item_val",
+//    and in optional example, query.optional is Some("opt_val")
+pub async fn with_both(path: web::Path<String>, query: web::Query<WithQueryInfo>) -> HttpResponse {
+    match get_template_context() {
+        Ok((tera, mut context)) => {
+            let path = &path.as_str();
+            let item = &query.item.as_str();
+            let resp_form = match &query.optional {
+                Some(opt) => format!("path: {}, item value: {}, optional: {}", &path, &item, &opt),
+                _ => format!("path: {}, item value: {}", &path, &item)
+            };
+            println!("resp_form: {}", &resp_form);
+            return HttpResponse::with_body(StatusCode::OK, Body::from_message(resp_form))
+        },
+        _ => {
+            return HttpResponse::with_body(StatusCode::OK, Body::from_message("error"))
+        }
+    }
+}
+
+pub async fn with_query(query: web::Query<WithQueryInfo>) -> HttpResponse {
+    match get_template_context() {
+        Ok((tera, mut context)) => {
+            let item = &query.item.as_str();
+            let resp_form = format!("item value: {}", &item);
+            println!("resp_form: {}", &resp_form);
+            return HttpResponse::with_body(StatusCode::OK, Body::from_message(resp_form))
+        },
+        _ => {
+            return HttpResponse::with_body(StatusCode::OK, Body::from_message("error"))
+        }
+    }
+}
+
+pub async fn with_path(info: web::Path<(String,String)>) -> HttpResponse {
+    match get_template_context() {
+        Ok((tera, mut context)) => {
+            let item = &info.0;
+            let item2 = &info.1;
+            let resp_form = format!("item value: {} /// {}", &item, &item2);
+            println!("resp_form: {}", &resp_form);
+            return HttpResponse::with_body(StatusCode::OK, Body::from_message(resp_form))
+        },
+        _ => {
+            return HttpResponse::with_body(StatusCode::OK, Body::from_message("error"))
+        }
+    }
+}
+
 pub async fn index(_req: HttpRequest) -> HttpResponse {
     let (tera, mut context) = get_template_context().unwrap();
     // get database connection
@@ -35,6 +100,7 @@ pub async fn index(_req: HttpRequest) -> HttpResponse {
     
     // let user_count = get_user_count(&mut conn);
     // context.insert("user_count", &user_count);
+    //context.insert(req.Data::<AppContext>)
 
     self::get_user_context(&mut context);
 

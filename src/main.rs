@@ -6,6 +6,7 @@ mod core;
 mod urls;
 mod views;
 mod db;
+mod app_context;
 mod app;
 
 #[actix_rt::main]
@@ -13,14 +14,18 @@ async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
     env_logger::init();
 
-    db::init_db();
-
+    let conn = db::init_db();
+    drop(conn);
     //println!("TABLE DEF: {}", app::models::test_table_def());
 
     //println!("User count:{}", app::models::get_user_count(&mut conn));
 
-    HttpServer::new(|| {
-        App::new()
+    let state = app_context::AppContext {
+        requests: 0
+    };
+
+    HttpServer::new(move || {
+        App::new().data(state.clone())
         // enable logger
         .wrap(middleware::Logger::default())
         // urls hook

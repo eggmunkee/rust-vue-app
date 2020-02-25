@@ -14,6 +14,9 @@ pub fn configure_urls(cfg: &mut web::ServiceConfig) {
     // Index
     cfg.service(web::resource("/").to(views::index))
     .service(web::resource("/index.html").to(views::index))
+    .service(web::resource("/with_both/{item}/").to(views::with_both))
+    .service(web::resource("/with_path/").to(views::with_query))
+    .service(web::resource("/with_path/{item}/{item2}").to(views::with_path))
     // about
     .service(web::resource("/about.html").to(|| async { "Rust Vue App, built with actix_web!" }));
 
