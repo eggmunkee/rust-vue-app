@@ -1,4 +1,5 @@
 use actix_web::{middleware, web, App, HttpServer};
+use std::sync::{Mutex};
 
 // Register modules
 mod macros;
@@ -8,6 +9,8 @@ mod views;
 mod db;
 mod app_context;
 mod app;
+
+use crate::app_context::{AppContext,AppInstanceContext};
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
@@ -20,12 +23,16 @@ async fn main() -> std::io::Result<()> {
 
     //println!("User count:{}", app::models::get_user_count(&mut conn));
 
-    let state = app_context::AppContext {
-        requests: 0
-    };
+    let state = web::Data::new(AppContext {
+        requests: Mutex::new(0)
+    });
 
-    HttpServer::new(move || {
-        App::new().data(state.clone())
+    // let counter = web::Data::new(AppContext {
+    //     requests: Mutex::new(0)
+    // });
+
+    let future_server = HttpServer::new(move || {
+        App::new().app_data(state.clone())
         // enable logger
         .wrap(middleware::Logger::default())
         // urls hook
@@ -33,8 +40,12 @@ async fn main() -> std::io::Result<()> {
         .default_service( web::route().to(views::default_404) )
     })
     .bind("127.0.0.1:8080")?
-    .run()
-    .await
+    .run();
+
+    match future_server.await {
+        Ok(_) => { Ok(()) },
+        Err(e) => { println!("Server error: {}", e); Ok(()) }
+    }
 }
 
 #[cfg(test)]

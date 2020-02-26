@@ -61,5 +61,5 @@ pub async fn static_content<'a>(req: HttpRequest) -> HttpResponse {
 }
 
 pub fn static_urls(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::resource("/static/{url}").to(self::static_content));
+    cfg.service(web::resource("/static/{url:[^{}]+}").to(self::static_content));
 }

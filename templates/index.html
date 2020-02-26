@@ -1,35 +1,25 @@
 {% extends "base.html" %}
 {% block title %}INDEX - Rust Vue App{% endblock %}
 {% block page_title %}Index Page{% endblock %}
+
 {% block content %}
-    <h2>Index content</h2>
-    <p>Test ipsul lorem semper fidelis. Test ipsul lorem semper fidelis. Test ipsul lorem semper fidelis.</p>
-    <p>Test ipsul lorem semper fidelis. Test ipsul lorem semper fidelis. Test ipsul lorem semper fidelis.</p>
-    <h1>User count: {{user_count}}</h1>
-    <ul>
-        {% for user in users %}
-        <div>
-            ({{loop.index}})
-            <strong>Name:</strong> {{ user.name }} 
-        </div>
-        <div>
-            <strong>Age:</strong> {{ user.age }} 
-        </div>
-        {% else %}
-        <div style="color:888;">No users</div>
-        {% endfor %}
-    </ul>
-    <textarea>
-        {{ users_json }}
-    </textarea>
-    <hr/>
-    <p>Test ipsul lorem semper fidelis. Test ipsul lorem semper fidelis. Test ipsul lorem semper fidelis.</p>
+    <div id="index_root"></div>
 {% endblock %}
+
 {% block js_includes %}
-<script type="text/javascript" src="/static/test.js"></script>
+<script type="text/javascript" src="/static/lib/jquery.js"></script>
+<script type="text/javascript" src="/static/lib/vue.js"></script>
+<script type="text/javascript" src="/static/index.js"></script>
 {% endblock %}
 {% block js_footer %}
 <script type="text/javascript">
     console.log('init page footer...');
+    let pageData = {
+        requests: {{ requests }},
+        user_count: {{ user_count }},
+        users: {{ users_json|safe }}
+    };
+    console.log('pageData:', pageData);
+    index($('#index_root').get(0), pageData);
 </script>
 {% endblock %}

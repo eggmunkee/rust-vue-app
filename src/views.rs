@@ -12,6 +12,7 @@ use tera::{Context};
 use crate::app::models::{get_users};
 use crate::core::utils::{get_template_context};
 use crate::db::{get_conn};
+use crate::app_context::{AppContext};
 
 pub fn get_user_context(context: &mut Context) {
     // Get users list and create json for list
@@ -93,15 +94,23 @@ pub async fn with_path(info: web::Path<(String,String)>) -> HttpResponse {
     }
 }
 
-pub async fn index(_req: HttpRequest) -> HttpResponse {
+const test : u64 = 1023;
+
+pub async fn index(_req: HttpRequest, data: web::Data<AppContext>) -> HttpResponse {
     let (tera, mut context) = get_template_context().unwrap();
     // get database connection
     //let mut conn = get_conn();
-    
-    // let user_count = get_user_count(&mut conn);
-    // context.insert("user_count", &user_count);
-    //context.insert(req.Data::<AppContext>)
+    println!("Before requests lock");
+    // 
+    if let Ok(mut requests) = data.requests.lock() {
+        *requests += 1;
+        context.insert("requests", &*requests);           
+    }
+    else {
+        context.insert("requests", "-1");           
+    }
 
+    println!("After requests lock");
     self::get_user_context(&mut context);
 
     //tera.add_template_file(Path::new("./templates/base.html"), Some("base"));

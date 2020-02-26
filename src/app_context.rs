@@ -1,9 +1,9 @@
 
 //use sqlite;
+use std::sync::{Mutex};
 
-#[derive(Clone)]
 pub struct AppContext {
-    pub requests: i64
+    pub requests: Mutex<i64>
 }
 
 pub struct AppInstanceContext {

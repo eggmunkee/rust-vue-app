@@ -16,10 +16,10 @@ pub async fn index<'a>(_req: HttpRequest) -> HttpResponse {
     get_user_context(&mut context);
 
     let _q = Question {
-        id: 1, name: "test"
+        id: 1, name: String::from("test")
     };
     let ans_name = format!("{}", "abc");
-    let _a = Answer { id: 1000, name: &ans_name.as_str() };
+    let _a = Answer { id: 1000, name: ans_name.to_string() };
     
     let mut conn = get_conn();
     get_users(&mut conn);

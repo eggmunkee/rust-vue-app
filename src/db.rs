@@ -3,7 +3,7 @@ use sqlite::{open,Connection};
 
 // Import module init model functions
 use crate::core::models::{init_core};
-use crate::app::models::{init_users};
+use crate::app::models::{init_app_models};
 
 pub fn get_conn() -> Connection {
     let path = "./db/main.db3";
@@ -19,23 +19,7 @@ pub fn init_db() -> Connection {
 
     init_core(&mut connection);
 
-    init_users(&mut connection);
+    init_app_models(&mut connection);
 
     connection
 }
-
-
-// pub fn init_users(connection: &sqlite::Connection) {
-//     match connection.execute(
-//         "
-//         CREATE TABLE users (name TEXT, age INTEGER);
-//         INSERT INTO users VALUES ('Alice', 42);
-//         INSERT INTO users VALUES ('Bob', 69);
-//         ",
-//     ) {
-//         Ok(_) => (),
-//         Err(e) => {
-//             println!("Users already exists.. skipping");
-//         }
-//     }
-// }
