@@ -14,6 +14,28 @@ use crate::core::utils::{get_template_context};
 use crate::db::{get_conn};
 use crate::app_context::{AppContext};
 
+#[derive(Deserialize)]
+pub struct CrudListQuery {
+    offset: Option<usize>
+}
+
+pub trait CrudModel {
+    fn model_name() -> String;
+    fn get(path: web::Path<(i64,)>, req: HttpRequest, data: web::Data<AppContext>) -> HttpResponse;
+    fn list(query: web::Query<CrudListQuery>, req: HttpRequest, data: web::Data<AppContext>) -> HttpResponse;
+    fn configure_model_crud(cfg: &mut web::ServiceConfig);
+}
+
+
+// pub fn configure_model_crud(cfg: &mut web::ServiceConfig) 
+//     where T: CrudModel {
+//     // base route on model name
+//     let model_name : String = T::model_name();
+//     cfg.service(web::scope(&model_name.as_str())
+//         .route("/{id}/", web::get().to(User::get)));
+// }
+
+
 pub fn get_user_context(context: &mut Context) {
     // Get users list and create json for list
     let mut conn = get_conn();
@@ -94,21 +116,20 @@ pub async fn with_path(info: web::Path<(String,String)>) -> HttpResponse {
     }
 }
 
-const test : u64 = 1023;
-
 pub async fn index(_req: HttpRequest, data: web::Data<AppContext>) -> HttpResponse {
     let (tera, mut context) = get_template_context().unwrap();
     // get database connection
     //let mut conn = get_conn();
     println!("Before requests lock");
     // 
-    if let Ok(mut requests) = data.requests.lock() {
-        *requests += 1;
-        context.insert("requests", &*requests);           
-    }
-    else {
-        context.insert("requests", "-1");           
-    }
+    // if let Ok(mut requests) = data.requests.lock() {
+    //     *requests += 1;
+    //     context.insert("requests", &*requests);           
+    // }
+    // else {
+    //     context.insert("requests", "-1");           
+    // }
+    context.insert("requests", &data.log_request());
 
     println!("After requests lock");
     self::get_user_context(&mut context);

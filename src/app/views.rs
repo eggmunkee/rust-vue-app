@@ -1,19 +1,23 @@
-use actix_web::{HttpRequest,HttpResponse};
-use actix_web::http::{StatusCode};
-use actix_web::dev::{ Body };
+use actix_web::{
+    web,HttpRequest,HttpResponse,
+    http::{StatusCode},
+    dev::{ Body }
+};
 
 
 use crate::app::models::{Question, Answer};
-
+use crate::app_context::{AppContext};
 use crate::db::{ get_conn };
 use crate::app::models::{ get_users };
 use crate::core::utils::{get_template_context};
 use crate::views::{get_user_context};
 
-pub async fn index<'a>(_req: HttpRequest) -> HttpResponse {
+pub async fn index<'a>(_req: HttpRequest, data: web::Data<AppContext>) -> HttpResponse {
     let (tera, mut context) = get_template_context().unwrap();
 
     get_user_context(&mut context);
+
+    context.insert("requests", &data.log_request());
 
     let _q = Question {
         id: 1, name: String::from("test")

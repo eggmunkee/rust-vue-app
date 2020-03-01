@@ -1,9 +1,25 @@
 
-use sqlite::{Type,Error};
+use crate::db::{get_conn};
+use sqlite::{Type,Error,Connection,Statement};
+use crate::app_context::{AppInstanceContext};
 
 // define columns of types
 //use crate::{create_table, columns, col_text, col_in, insert_row, val_text, val_int};
 const CORE_INIT_TABLE: &str = "core_app_init";
+
+pub fn prep_statement<'a>(app: &'a mut AppInstanceContext, query: &str) -> Result<Box<Statement<'a>>,()> {
+    //let prepped_statement = ;
+    // let c = conn;
+    // let qry : String = String::from(query);    
+    let statement = app.connection.prepare(query);
+    match statement {
+        Ok(statement) => {
+            let s : Statement = statement;
+            Ok(Box::new(s))
+        },
+        Err(_) => Err(())
+    }
+}
 
 pub fn init_core(connection: &sqlite::Connection) {
     let cmd = create_table!(CORE_INIT_TABLE,columns!(col_text!("table_name"),col_int!("init")));

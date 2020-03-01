@@ -23,3 +23,4 @@ pub fn init_db() -> Connection {
 
     connection
 }
+

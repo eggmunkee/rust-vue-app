@@ -2,9 +2,15 @@
 use sqlite::{State,Statement};
 
 use serde::{Serialize,Deserialize};
+use serde_json::json;
 
-use crate::core::models::{is_table_inited,add_init_table};
+use actix_web::{web, HttpRequest, HttpResponse, Result as ActixResult};
+
+use crate::db::{get_conn};
+use crate::core::models::{is_table_inited,add_init_table,prep_statement};
+use crate::views::{CrudModel,CrudListQuery};
 use crate::macros::*;
+use crate::app_context::{AppContext,AppInstanceContext};
 
 #[derive(Debug,Serialize,Deserialize)]
 pub struct User {
@@ -12,6 +18,94 @@ pub struct User {
     pub name: String,
     pub age: i64,
 }
+
+impl User {
+    pub fn new() -> User {
+        User {
+            rowid: -1,
+            name: String::new(),
+            age: 0
+        }
+    }
+}
+
+impl CrudModel for User {
+    fn model_name() -> String {
+        String::from("users")
+    }
+    fn get(path: web::Path<(i64,)>, req: HttpRequest, data: web::Data<AppContext>) -> HttpResponse {
+        data.log_request();
+        let mut app_instance = AppInstanceContext::new();
+        // let prep_statement borrow app instance to get boxed statement
+        let mut boxed_statement = prep_statement(&mut app_instance, "SELECT rowid, * FROM users WHERE rowid = ?");
+        match boxed_statement  {
+            Ok(statement) => {
+                let mut statement = *statement; // deference boxed statement returned from prep_statement
+                statement.bind(1, path.0).unwrap();
+                println!("get User id: {}", path.0);
+
+                if let State::Row = statement.next().unwrap() {
+                    HttpResponse::Ok().json( User {
+                        rowid: statement.read::<i64>(0).unwrap(),
+                        name: statement.read::<String>(1).unwrap(),
+                        age: statement.read::<i64>(2).unwrap(),
+                    })
+                }
+                else {
+                    HttpResponse::NotFound().json(User {
+                        rowid: -1,
+                        name: String::from("Not found."),
+                        age: 0
+                    })
+                }            
+            },
+            Err(_) => {
+                HttpResponse::InternalServerError().json(User {
+                    rowid: -1,
+                    name: String::from("Query error."),
+                    age: 0
+                })
+            }
+        }
+    }
+    fn list(query: web::Query<CrudListQuery>, req: HttpRequest, data: web::Data<AppContext>) -> HttpResponse {
+        data.log_request();
+
+        let mut conn = get_conn();
+        let prepped_statement = conn.prepare("SELECT rowid, * FROM users ORDER BY name");
+        if let Ok(mut statement) = prepped_statement {
+            println!("get Users:");
+            let mut users = Vec::<User>::new();
+
+            while let State::Row = statement.next().unwrap() {
+                users.push(User {
+                    rowid: statement.read::<i64>(0).unwrap(),
+                    name: statement.read::<String>(1).unwrap(),
+                    age: statement.read::<i64>(2).unwrap(),
+                });
+            }
+
+            HttpResponse::Ok().json(users)
+        }
+        else {
+            HttpResponse::InternalServerError().json(User {
+                rowid: -1,
+                name: String::from("Query error."),
+                age: 0
+            })
+        }
+    }
+    fn configure_model_crud(cfg: &mut web::ServiceConfig) {
+        // base route on model name
+        let model_name : String = User::model_name();
+        cfg.service(web::scope(&model_name.as_str())
+            .route("/{id}/", web::get().to(User::get))
+            .route("/", web::get().to(User::list))
+            .route("/", web::post().to(User::list))
+            .route("/{id}/", web::put().to(User::list)));
+    }
+}
+
 
 #[derive(Debug,Serialize,Deserialize)]
 pub struct SavedUrl {
@@ -139,9 +233,8 @@ pub fn get_users(connection: &mut sqlite::Connection) -> Vec::<User> {
     println!("About to query users...");
     let prepped_statement = connection.prepare("SELECT rowid, * FROM users");
     if let Ok(mut statement) = prepped_statement {
-        println!("Some() prepped statement.");
         let mut users = Vec::new();
-        println!("get_users");
+        println!("get_users processing rows...");
 
         while let State::Row = statement.next().unwrap() {
             println!("name = {}", statement.read::<String>(0).unwrap());

@@ -40,6 +40,7 @@ async fn main() -> std::io::Result<()> {
         .default_service( web::route().to(views::default_404) )
     })
     .bind("127.0.0.1:8080")?
+    .bind("192.168.0.100:8080")?
     .run();
 
     match future_server.await {
