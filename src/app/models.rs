@@ -33,11 +33,11 @@ impl CrudModel for User {
     fn model_name() -> String {
         String::from("users")
     }
-    fn get(path: web::Path<(i64,)>, req: HttpRequest, data: web::Data<AppContext>) -> HttpResponse {
+    fn get(path: web::Path<(i64,)>, _req: HttpRequest, data: web::Data<AppContext>) -> HttpResponse {
         data.log_request();
         let mut app_instance = AppInstanceContext::new();
         // let prep_statement borrow app instance to get boxed statement
-        let mut boxed_statement = prep_statement(&mut app_instance, "SELECT rowid, * FROM users WHERE rowid = ?");
+        let boxed_statement = prep_statement(&mut app_instance, "SELECT rowid, * FROM users WHERE rowid = ?");
         match boxed_statement  {
             Ok(statement) => {
                 let mut statement = *statement; // deference boxed statement returned from prep_statement
@@ -68,15 +68,17 @@ impl CrudModel for User {
             }
         }
     }
-    fn list(query: web::Query<CrudListQuery>, req: HttpRequest, data: web::Data<AppContext>) -> HttpResponse {
+    fn list(_query: web::Query<CrudListQuery>, _req: HttpRequest, data: web::Data<AppContext>) -> HttpResponse {
         data.log_request();
 
-        let mut conn = get_conn();
-        let prepped_statement = conn.prepare("SELECT rowid, * FROM users ORDER BY name");
-        if let Ok(mut statement) = prepped_statement {
+        let mut app_instance = AppInstanceContext::new();
+        // let prep_statement borrow app instance to get boxed statement
+        let boxed_statement = prep_statement(&mut app_instance, "SELECT rowid, * FROM users ORDER BY name");
+        //match boxed_statement  {
+        if let Ok(boxed_statement) = boxed_statement {
             println!("get Users:");
             let mut users = Vec::<User>::new();
-
+            let mut statement = *boxed_statement;
             while let State::Row = statement.next().unwrap() {
                 users.push(User {
                     rowid: statement.read::<i64>(0).unwrap(),

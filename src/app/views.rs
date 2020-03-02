@@ -3,10 +3,10 @@ use actix_web::{
     http::{StatusCode},
     dev::{ Body }
 };
-
+use serde_json::{json};
 
 use crate::app::models::{Question, Answer};
-use crate::app_context::{AppContext};
+use crate::app_context::{AppContext,AppInstanceContext};
 use crate::db::{ get_conn };
 use crate::app::models::{ get_users };
 use crate::core::utils::{get_template_context};
@@ -19,14 +19,12 @@ pub async fn index<'a>(_req: HttpRequest, data: web::Data<AppContext>) -> HttpRe
 
     context.insert("requests", &data.log_request());
 
-    let _q = Question {
-        id: 1, name: String::from("test")
-    };
-    let ans_name = format!("{}", "abc");
-    let _a = Answer { id: 1000, name: ans_name.to_string() };
-    
-    let mut conn = get_conn();
-    get_users(&mut conn);
+    // Get app instance with database connection    
+    let mut app_instance = AppInstanceContext::new();
+    let mut conn = app_instance.connection;
+    // get users
+    let users = get_users(&mut conn);
+    context.insert("users", &serde_json::to_string(&users).unwrap());
 
     let page_source = match tera.render("app/index.html", &context) {
         Ok(r) => r,
