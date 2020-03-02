@@ -1,0 +1,14 @@
+{
+  "name": "rust_vue",
+  "version": "0.1.0",
+  "description": "Basic Rust Vue app with db models, routes/views, view templates, etc.",
+  "scripts": {
+    "test": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "",
+  "license": "ISC"
+}

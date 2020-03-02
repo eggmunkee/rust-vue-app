@@ -1,0 +1,35 @@
+
+body {
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-size: 100%;
+    font-weight: normal;
+    background-color: #333;
+    color: #ca0;
+}
+
+h1 { color: #883;}
+p { margin: 20px; }
+
+a { color: #80f; }
+a:visited { color: #88f; }
+a:hover { color: #b0f; }
+a:active { color: #b0f; }
+
+input[type="text"] { 
+    border: 2px solid #ccc; background-color: #eee; color: #b0f; 
+    border-radius: 3px; line-height: 1.5; padding: 2px; font-weight: bold;
+}
+textarea { 
+    border: 2px solid #ccc; background-color: #eee; color: #b0f; 
+    border-radius: 3px; line-height: 1.5; padding: 2px; font-weight: bold;
+}
+input[type="checkbox"] { 
+    border: 2px solid #88f; border-radius: 3px; line-height: 1.5; padding: 2px; color: red;
+}
+input[type="radio"] { 
+    border: 2px solid #88f; border-radius: 3px; line-height: 1.5; padding: 2px; color: red;
+}
+
+/* Footer and service note styles */
+
+.service-note { font-size: .7em; padding: 2px; border: 1px solid rgba(100,100,100,0.1); background-color: rgba(150,150,150,0.2);}

@@ -3,8 +3,26 @@
 {% block page_title %}Rust Vue App{% endblock %}
 {% block content %}
     <h2>Rust Vue App Content</h2>
-    <p>Test ipsul lorem semper fidelis. Test ipsul lorem semper fidelis. Test ipsul lorem semper fidelis.</p>
-    <p>Test ipsul lorem semper fidelis. Test ipsul lorem semper fidelis. Test ipsul lorem semper fidelis.</p>
-    <hr/>
-    <p>Test ipsul lorem semper fidelis. Test ipsul lorem semper fidelis. Test ipsul lorem semper fidelis.</p>
+    <div id="index_root"></div>
+{% endblock %}
+
+{# JS includes and content #}
+{% block js_includes %}
+<script type="text/javascript" src="/static/lib/jquery.js"></script>
+<script type="text/javascript" src="/static/lib/vue.js"></script>
+<script type="text/javascript" src="/static/js/comp/users-list.js"></script>
+<script type="text/javascript" src="/static/js/comp/user-form.js"></script>
+<script type="text/javascript" src="/static/js/app/index.js"></script>
+{% endblock %}
+{% block js_footer %}
+<script type="text/javascript">
+    console.log('init page footer...');
+    let pageData = {
+        requests: {{ requests }},
+        user_count: {{ user_count }}
+        //users: {{ users_json|safe }}
+    };
+    console.log('pageData:', pageData);
+    index($('#index_root').get(0), pageData);
+</script>
 {% endblock %}
