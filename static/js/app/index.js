@@ -14,6 +14,7 @@ function index(el, pageData) {
                 <h1 style="background-color: yellow;">{{requests}}</h1>
                 <users-list :user_count="user_count" />
                 <user-form />
+                <music-player />
             </div>
         `,
         methods: {

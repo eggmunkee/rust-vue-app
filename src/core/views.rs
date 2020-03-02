@@ -57,6 +57,9 @@ pub async fn static_content<'a>(req: HttpRequest) -> HttpResponse {
         x if x.ends_with(".json") => {
             hdrs.insert(HeaderName::from_static("content-type"), HeaderValue::from_static("application/json"));
         },
+        x if x.ends_with(".mp3") => {
+            hdrs.insert(HeaderName::from_static("content-type"), HeaderValue::from_static("audio/mpeg"));
+        },
         _ => ()
     }
     

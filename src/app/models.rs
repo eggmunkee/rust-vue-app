@@ -97,6 +97,37 @@ impl CrudModel for User {
             })
         }
     }
+    // fn create(_query: web::Query<CrudListQuery>, _req: HttpRequest, data: web::Data<AppContext>) -> HttpResponse {
+    //     data.log_request();
+
+    //     let mut app_instance = AppInstanceContext::new();
+    //     // let prep_statement borrow app instance to get boxed statement
+    //     let boxed_statement = prep_statement(&mut app_instance, 
+    //         "insert into users values (?,?); select rowid, * from users order by rowid desc limit 1;");
+    //     //match boxed_statement  {
+    //     if let Ok(boxed_statement) = boxed_statement {
+    //         println!("Add user:");
+    //         let mut users = Vec::<User>::new();
+    //         let mut statement = *boxed_statement;
+    //         statement.bind(1, )
+    //         while let State::Row = statement.next().unwrap() {
+    //             users.push(User {
+    //                 rowid: statement.read::<i64>(0).unwrap(),
+    //                 name: statement.read::<String>(1).unwrap(),
+    //                 age: statement.read::<i64>(2).unwrap(),
+    //             });
+    //         }
+
+    //         HttpResponse::Ok().json(users)
+    //     }
+    //     else {
+    //         HttpResponse::InternalServerError().json(User {
+    //             rowid: -1,
+    //             name: String::from("Query error."),
+    //             age: 0
+    //         })
+    //     }
+    // }
     fn configure_model_crud(cfg: &mut web::ServiceConfig) {
         // base route on model name
         let model_name : String = User::model_name();
