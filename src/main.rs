@@ -17,20 +17,12 @@ async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
     env_logger::init();
 
-    let conn = db::init_db();
-    drop(conn);
-    //println!("TABLE DEF: {}", app::models::test_table_def());
-
-    //println!("User count:{}", app::models::get_user_count(&mut conn));
-
+    // Construct shared state object
     let state = web::Data::new(AppContext {
         requests: Mutex::new(0)
     });
 
-    // let counter = web::Data::new(AppContext {
-    //     requests: Mutex::new(0)
-    // });
-
+    // Create server app factory
     let future_server = HttpServer::new(move || {
         App::new().app_data(state.clone())
         // enable logger
@@ -39,10 +31,12 @@ async fn main() -> std::io::Result<()> {
         .configure(urls::configure_urls)
         .default_service( web::route().to(views::default_404) )
     })
+    // Bind to ips/ports
     .bind("127.0.0.1:8080")?
     .bind("192.168.0.100:8080")?
+    // Finalize?
     .run();
-
+    // Block on async server function to run it until further notice
     match future_server.await {
         Ok(_) => { Ok(()) },
         Err(e) => { println!("Server error: {}", e); Ok(()) }
