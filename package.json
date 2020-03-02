@@ -10,5 +10,8 @@
     "url": ""
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "vue-plyr": "^6.0.4"
+  }
 }

@@ -2,3 +2,4 @@
 **/*.rs.bk
 *.db3
 *.zip
+/node_modules
