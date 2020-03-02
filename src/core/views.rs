@@ -33,37 +33,63 @@ fn load_static_url<'a>(url: &str) -> String {
     body_string
 }
 
+fn is_static_load_url(url : &str) -> bool {
+    match url {
+        x if x.ends_with(".mp3") => {
+            false
+        },
+        _ => true
+    }
+}
+
 pub async fn static_content<'a>(req: HttpRequest) -> HttpResponse {
     // get parameters from request
-    let match_info = req.match_info();
-    let url = match_info.query("url");
+    let match_info = req.match_info(); // get match info about request url and route
+    let url = match_info.query("url"); // get url param by name
     
-    let body_string = self::load_static_url(url);
+    // Create ok response, and see if the url is a statis loadable asset
+    let mut rb = HttpResponse::Ok();
+    let can_static_load = is_static_load_url(&url);
 
-    let mut response = HttpResponse::with_body(StatusCode::OK, Body::from_message(body_string));
-
-    let hdrs = response.headers_mut();
-
+    // Set content type headers and whether the url can be loaded
+    let mut allow = false;
     match url {
         x if x.ends_with(".json") => {
-            hdrs.insert(HeaderName::from_static("content-type"), HeaderValue::from_static("application/json"));
+            allow = true;
+            rb.header(HeaderName::from_static("content-type"), HeaderValue::from_static("application/json"));
         },
         x if x.ends_with(".js") => {
-            hdrs.insert(HeaderName::from_static("content-type"), HeaderValue::from_static("text/javascript;charset=UTF-8"));
+            allow = true;
+            rb.header(HeaderName::from_static("content-type"), HeaderValue::from_static("text/javascript;charset=UTF-8"));
         },
         x if x.ends_with(".css") => {
-            hdrs.insert(HeaderName::from_static("content-type"), HeaderValue::from_static("text/css;charset=UTF-8"));
+            allow = true;
+            rb.header(HeaderName::from_static("content-type"), HeaderValue::from_static("text/css;charset=UTF-8"));
         },
         x if x.ends_with(".json") => {
-            hdrs.insert(HeaderName::from_static("content-type"), HeaderValue::from_static("application/json"));
+            allow = true;
+            rb.header(HeaderName::from_static("content-type"), HeaderValue::from_static("application/json"));
         },
-        x if x.ends_with(".mp3") => {
-            hdrs.insert(HeaderName::from_static("content-type"), HeaderValue::from_static("audio/mpeg"));
-        },
-        _ => ()
+        // x if x.ends_with(".mp3") => {
+        //     rb.header(HeaderName::from_static("content-type"), HeaderValue::from_static("audio/mpeg"));
+        // },
+        _ => {
+            allow = false;
+        }
     }
+
+    match allow {
+        true => {
+            let body_string = self::load_static_url(url);
+            rb.body(body_string)
+        },
+        _ => {
+            //let body_string = self::load_static_url(url);
+            rb.body("")
+        }
+    }
+
     
-    response
 }
 
 pub fn static_urls(cfg: &mut web::ServiceConfig) {

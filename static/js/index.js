@@ -11,7 +11,7 @@ function index(el, pageData) {
         },
         template: `
             <div class="index-app">
-                <h1 style="background-color: yellow;">{{requests}}</h1>
+                <sub>{{requests}} requests received.</sub>
                 <users-list :user_count="user_count" />
             </div>
         `,

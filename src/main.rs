@@ -16,6 +16,9 @@ use crate::app_context::{AppContext,AppInstanceContext};
 async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
     env_logger::init();
+    
+    // initialize database schema if needed
+    db::init_db();
 
     // Construct shared state object
     let state = web::Data::new(AppContext {
@@ -24,17 +27,18 @@ async fn main() -> std::io::Result<()> {
 
     // Create server app factory
     let future_server = HttpServer::new(move || {
+        // create new app instance with a clone of the state data
         App::new().app_data(state.clone())
-        // enable logger
+        // enable logger middleware
         .wrap(middleware::Logger::default())
-        // urls hook
+        // hooks to configure app urls and fallback url view
         .configure(urls::configure_urls)
         .default_service( web::route().to(views::default_404) )
     })
     // Bind to ips/ports
     .bind("127.0.0.1:8080")?
     .bind("192.168.0.100:8080")?
-    // Finalize?
+    // Finalize
     .run();
     // Block on async server function to run it until further notice
     match future_server.await {

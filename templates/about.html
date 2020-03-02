@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{# Content Title and Page Title #}
+{% block title %}About - Rust Vue App{% endblock %}
+{% block page_title %}About the Rust Vue App{% endblock %}
+{# main content of page #}
+{% block content %}
+<div style="margin-left:20px; margin-right:auto; margin-top:20px; margin-bottom:20px; width: 800px;">
+    <p>
+        A test app combining rust's Actix-web framework, sqlite database, and tera templating engine
+        to serve both server-side rendered templates and client-side VueJS page content.
+    </p>
+    <p>
+        Query parameters, json data, and route url parameters can be mapped to the async function
+        views which respond to them, in most cases directly into structs that validate types. Json
+        data can be received and returned as typed objects, for example app's User model.
+    </p>
+    <p>
+        The project loosely follows Django conventions for urls, views, models, etc. contained
+        in one or more app folders under the root source directory. The main.rs launches the
+        server processes and calls on modules to add in all accessible url routes and handlers.
+    </p>    
+</div>
+{% endblock %}
+
+{# JS includes and content #}
+{% block js_includes %}
+<script type="text/javascript" src="/static/js/lib/jquery.js"></script>
+{% endblock %}
+{% block js_footer %}
+<script type="text/javascript">
+    console.log('init page footer...');
+</script>
+{% endblock %}

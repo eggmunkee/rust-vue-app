@@ -97,15 +97,15 @@ pub fn is_table_inited(connection: &sqlite::Connection, name: &str) -> bool {
                 Ok(sqlite::State::Row) => { // 
                     match s.read::<i64>(0) {
                         Ok(x) if x > 0 => {
-                            println!("App_Init count: {}", &x);
+                            println!("{} already inited.", name);
                             true
                         },
                         Ok(_) => {
-                            println!("App_Init doesn't contain {}", name);
+                            println!("{} has not been inited.", name);
                             false
                         },
                         _ => {
-                            println!("Error reading app_init count column.");
+                            println!("Error reading Core App Init value for {}.", name);
                             false
                         }
                     }

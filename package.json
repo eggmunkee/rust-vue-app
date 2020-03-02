@@ -12,6 +12,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "plyr": "^3.5.10",
     "vue-plyr": "^6.0.4"
+  },
+  "devDependencies": {
+    "jquery": "",
+    "vue": ""
   }
 }

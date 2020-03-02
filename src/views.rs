@@ -2,10 +2,7 @@ use actix_web::{web, HttpRequest, HttpResponse};
 use actix_web::http::{StatusCode};
 use actix_web::dev::{ Body };
 
-
 use serde::Deserialize;
-
-// file reading requirements
 
 use tera::{Context};
 
@@ -14,11 +11,13 @@ use crate::core::utils::{get_template_context};
 use crate::db::{get_conn};
 use crate::app_context::{AppContext};
 
+// define query string params for Crud List operations (for paging, etc.)
 #[derive(Deserialize)]
 pub struct CrudListQuery {
     offset: Option<usize>
 }
 
+// Definte a trait for generic handling of Crud apis for models, the urls and views which respond
 pub trait CrudModel {
     fn model_name() -> String;
     fn get(path: web::Path<(i64,)>, req: HttpRequest, data: web::Data<AppContext>) -> HttpResponse;
@@ -26,7 +25,8 @@ pub trait CrudModel {
     fn configure_model_crud(cfg: &mut web::ServiceConfig);
 }
 
-
+// TODO: generalize routes portion using template with trait CrudModel
+// borrow checker not happy with current code
 // pub fn configure_model_crud(cfg: &mut web::ServiceConfig) 
 //     where T: CrudModel {
 //     // base route on model name
@@ -37,21 +37,21 @@ pub trait CrudModel {
 
 
 pub fn get_user_context(context: &mut Context) {
-    // Get users list and create json for list
+    // Get db connection and users list
     let mut conn = get_conn();
-    
     let users = get_users(&mut conn);
+    drop(conn); // drop connection memory
+
+    // fill in context with users information
     context.insert("users", &users);
-    //let users = get_user_list();   
     context.insert("user_count", &users.len());
-    //context.insert("users", &users);
+    // serialize users list into context
     if let Ok(users_json) = serde_json::to_string(&users) {
         context.insert("users_json", &users_json);
     }
     else {
         context.insert("users_json", &"[]");
     }
-    
 }
 
 // TESTING PATH AND QUERY 
@@ -102,6 +102,7 @@ pub async fn with_query(query: web::Query<WithQueryInfo>) -> HttpResponse {
 }
 
 pub async fn with_path(info: web::Path<(String,String)>) -> HttpResponse {
+    // 
     match get_template_context() {
         Ok((tera, mut context)) => {
             let item = &info.0;
@@ -118,61 +119,60 @@ pub async fn with_path(info: web::Path<(String,String)>) -> HttpResponse {
 
 pub async fn index(_req: HttpRequest, data: web::Data<AppContext>) -> HttpResponse {
     let (tera, mut context) = get_template_context().unwrap();
-    // get database connection
-    //let mut conn = get_conn();
-    println!("Before requests lock");
-    // 
-    // if let Ok(mut requests) = data.requests.lock() {
-    //     *requests += 1;
-    //     context.insert("requests", &*requests);           
-    // }
-    // else {
-    //     context.insert("requests", "-1");           
-    // }
+    // log request and save result in context    
     context.insert("requests", &data.log_request());
-
-    println!("After requests lock");
+    // add user context information into the context object
     self::get_user_context(&mut context);
-
-    //tera.add_template_file(Path::new("./templates/base.html"), Some("base"));
-    let res = match tera.render("index.html", &context) {
+    // try to render the index template with context
+    let rendered = match tera.render("index.html", &context) {
         Ok(r) => r,
         Err(e) => { 
             println!("Render error(s): {}", e);
             ::std::process::exit(1);
         }
     };
-    //if let Ok(body_string) = res {
-    HttpResponse::with_body(StatusCode::OK, Body::from_message(res))
-    //} else if let Error(err) = res {
-        //HttpResponse::with_body(StatusCode::OK, Body::from_message(format!("Error rendering base.html: {}", err)))
-    //}
-
-    
-
-    //let user_size = get_users();
-
-    //let resp = format!("/ Hello world! User count: {}", &0);
-
-    //resp
+    // return rendered template as 200 - Ok response
+    HttpResponse::Ok().body(rendered)
 }
 
+pub async fn about(_req: HttpRequest, data: web::Data<AppContext>) -> HttpResponse {
+    // Get the template engine and template context
+    let (tera, mut context) = get_template_context().unwrap();
+    // Insert # of requests into template context
+    context.insert("requests", &data.log_request());
+    // render template or process template error
+    let rendered = match tera.render("about.html", &context) {
+        Ok(r) => r, // set rendered = to the result r
+        Err(e) => { 
+            println!("Render error(s): {}", e);
+            ::std::process::exit(1);
+        }
+    };
+    // Return Ok response with rendered template
+    HttpResponse::Ok().body(rendered)
+}
+
+
 pub async fn default_404(req: HttpRequest) -> HttpResponse {
-    // Build response body
+    // For a simple response body
+    // Build response body with a String object
     let mut msg = String::from("<!doctype html>
     <html>
+        <head>
+            <link rel=\"stylesheet\" type=\"text/css\" href=\"/static/css/base.css\">
+        </head>
         <body>
-        <h1>That ain't here, or here isn't that.</h1>
+        <h1>That isn't here.</h1>
         <p>Try <a href=\"/\">here</a>.</p>
         <h1>Attempted url:
     ");
-    // include path
+    // include path manually
     msg.push_str(req.path());
     // footer
     msg.push_str("</h1></body>
     </html>");
-
-    HttpResponse::with_body(StatusCode::OK, Body::from_message(msg))
+    // return string response body
+    HttpResponse::Ok().body(msg)
 }
 
 

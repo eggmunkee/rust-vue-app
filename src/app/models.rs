@@ -195,7 +195,7 @@ pub fn init_app_models(connection: &mut sqlite::Connection) {
             insert_row!("users","'Alicia', 36"),
             insert_row!("users","'Noah', 37").as_str() );
         match connection.execute( &cmd ) {
-            Ok(_) =>  { println!("2 Users [inserted]."); },
+            Ok(_) =>  { println!("User data inserted."); },
             Err(e) => {
                 println!("Users init Error: {}\n Cmd: {}", e, &cmd);
             }
@@ -222,10 +222,8 @@ pub fn init_app_models(connection: &mut sqlite::Connection) {
         // Create initial data for users table
         println!("Creating saved_urls initial data...");
         cmd = format!("{} {}", 
-            insert_row_cols!("saved_urls","name, url, favorite", format!("'{}','{}',{}",&"Alicia''s url", &"https://www.twitter.com/AliciaF424", &1)),
-            insert_row_cols!("saved_urls","name, url, favorite", format!("'{}','{}',{}",&"Noah - Banned.video", &"https://banned.video/", &1))
-            //insert_row!("saved_urls",columns!(val_int!(1), val_text!("Alicia's url"), val_int!(36) )),
-            //insert_row!("saved_urls",columns!(val_int!(2),val_text!("Noah - Banned.video"), val_text!("https://banned.video/"))).as_str() );
+            insert_row_cols!("saved_urls","name, url, favorite", format!("'{}','{}',{}",&"url1", &"https://url.io", &1)),
+            insert_row_cols!("saved_urls","name, url, favorite", format!("'{}','{}',{}",&"url2", &"https://url2.io", &0))
         );
         match connection.execute( &cmd ) {
             Ok(_) =>  { println!("Saved URLs [inserted]."); },
@@ -235,7 +233,7 @@ pub fn init_app_models(connection: &mut sqlite::Connection) {
         }
     }
     else {
-        println!("Skipping init users...");
+        println!("Skipping init saved urls...");
     }
         
         
