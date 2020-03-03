@@ -5,6 +5,8 @@ body {
     font-weight: normal;
     background-color: #333;
     color: #ca0;
+    background-image: url(/static/fractal-bg-1.png);
+    background-blend-mode: multiply;
 }
 
 h1 { color: #883;}
