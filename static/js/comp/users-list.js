@@ -1,11 +1,17 @@
 Vue.component('users-list', {
     props: {
-        'user_count': Number
+        'user_count': Number,
+        'autoload': { type: Boolean, default: true }
     },
     data: function() {
         return {
             users: []
         };
+    },
+    mounted: function() {
+        if (this.autoload) {
+            this.updateUsers();
+        }
     },
     template: `
             <div class="users-list">
