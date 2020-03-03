@@ -26,7 +26,7 @@ Vue.component('user-form', {
                 name: self.user.name, age: self.user.age
             }}, function(user) {
                 console.log('saved user: ', JSON.stringify(user));
-                console.log(user.name);
+                //console.log(user.name);
                 //self.users = users;
                 self.$emit('addUser', user);
             }).fail(function(err) {
