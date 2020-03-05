@@ -4,6 +4,7 @@ use sqlite::{open,Connection};
 // Import module init model functions
 use crate::core::models::{init_core};
 use crate::app::models::{init_app_models};
+use crate::survey::models::{init_survey_models};
 
 pub fn get_conn() -> Connection {
     let path = "./db/main.db3";
@@ -21,6 +22,10 @@ pub fn init_db() -> Connection {
 
     init_app_models(&mut connection);
 
+    init_survey_models(&mut connection);
+    
     connection
 }
+
+
 

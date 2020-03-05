@@ -1,6 +1,6 @@
 target/**
 **/*.rs.bk
-*.db3
+db/**
 *.zip
 node_modules/**
 static/audio/**

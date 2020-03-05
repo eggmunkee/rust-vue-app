@@ -92,9 +92,6 @@ pub async fn static_content<'a>(req: HttpRequest) -> HttpResponse {
             load_string = false; // load as bytes
             rb.header(HeaderName::from_static("content-type"), HeaderValue::from_static("audio/mpeg"));
         },
-        // x if x.ends_with(".mp3") => {
-        //     rb.header(HeaderName::from_static("content-type"), HeaderValue::from_static("audio/mpeg"));
-        // },
         _ => {
             allow = false;
         }

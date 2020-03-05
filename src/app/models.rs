@@ -148,16 +148,16 @@ pub struct SavedUrl {
     pub favorite: i64,
 }
 
-#[derive(Debug,Serialize,Deserialize)]
-pub struct Question {
-    pub id: i32,
-    pub name: String,
-}
-#[derive(Debug,Serialize,Deserialize)]
-pub struct Answer {
-    pub id: i32,
-    pub name: String,
-}
+// #[derive(Debug,Serialize,Deserialize)]
+// pub struct Question {
+//     pub id: i32,
+//     pub name: String,
+// }
+// #[derive(Debug,Serialize,Deserialize)]
+// pub struct Answer {
+//     pub id: i32,
+//     pub name: String,
+// }
 
 pub fn get_user_list() -> Vec<User> {
     let users : Vec<User> = Vec::new();

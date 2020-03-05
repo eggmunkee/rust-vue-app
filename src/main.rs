@@ -9,6 +9,7 @@ mod views;
 mod db;
 mod app_context;
 mod app;
+mod survey;
 
 use crate::app_context::{AppContext,AppInstanceContext};
 
